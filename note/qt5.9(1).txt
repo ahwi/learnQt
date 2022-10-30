@@ -1,0 +1,59 @@
+
+createChart() 创建图表
+prepareData() 生成数据
+updateFromChart() 从图标获得属性值，刷新界面显示
+
+笔画设置对话框 QWDialogPen
+
+QChart的设置
+
+
+#### 9.1.3 图表的主要组成部分
+
+* QChartView的功能
+	* 在窗口设计界面上使用QChartView时，就是先放置一个QGraphicsView组件，然后升级QChartView
+	* QChartView类定义的函数：
+		* `void setChart(QChart *chart)` 设置一个QChart对象作为显示的图表
+		* `QChart *chart()` 返回QChartView当前设置的QChart类对象
+		* `void setRubberBand(RubberBands &rubberBand)`设置选取框的类型，即鼠标在视图组件上拖动选择范围的方式，是一个QChartView::RubberBands枚举类型的组合，取值如下：
+			* QChartView::NoRubberBand 无框选择
+			* QChartView::VerticalRubberBand 垂直选择
+			* QChartView::HorizontalRubberBand 水平选择
+			* QChartView::RectangleRubberBand 矩形框选择
+			* RubberBands rubberRand() 返回设置的选择框类型
+* 序列
+	序列是数据的表现形式，图表的类型主要就是由序列的类型决定的，常见的图标类型有折线图、柱状图、饼图、散点图等，Qt Charts能实现的常见图表示例及用到的序列类见表9-1
+		表9-1 TODO
+* 坐标轴
+	坐标轴类封装了坐标轴的刻度、标签、网格线、标题等属性
+	一般的图表都有横轴和纵轴两个坐标轴。
+		* 折线图一般表示数据，坐标轴用QValueAxis类的数值坐标轴，如果用对数坐标，可以使用QLogValueAxis类的坐标轴
+		* 柱状图的横坐标通常是文字，可以使用QBarCategoryAxis作为横轴
+		* 饼图一般没有坐标轴
+		
+	Qt Charts的坐标轴类、特点及其适用情况见表9-2
+		TODO 表9-2
+	类的继承关系如图9-4所示
+		TODO 图9-4
+	
+* 图例
+	图例(Legend)是对图表上显示的序列的示例说明。
+	QLegend类封装了图例控制功能的类，可以为每个序列设置图例中的文字，可以控制图例显示在图标的上、下、左、右不同位置
+	QLegendMarker类
+	可以为每个序列的图例生成一个类似于QCheckBox的组件，在图例上单机序列的标记，可以控制序列是否显示
+
+### 9.2 QChart绘制折线图
+#### 9.2.1 实例功能
+实例samp9_2以绘制折线图为例，详细介绍图表的各部分的设置和操作。
+图9-5 TODO
+界面设计分为如下几个部分：
+* 工具栏：创建几个Action，并创建工具栏，实现图标数据刷新和缩放功能。
+* 主工作区图表视图：从组件面板放置一个QGraphicsView组件作为视图组件，并提升为QChartView组件
+* 图标属性设置面板：左侧是一个QToolBox组件，分为3个操作面板，用于进行图标设置，曲线设置和坐标轴设置
+
+#### 9.2.2 主窗口类定义和初始化
+MainWidow类的实现
+在构造函数中调用的三个函数：
+* `createChart()` 创建图标
+* `prepareData()` 生成数据
+* `updateFromChart()` 从图标获得属性值，刷新界面显示
