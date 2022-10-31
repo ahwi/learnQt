@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <QItemSelectionModel>
 #include "qwdialogsize.h"
+#include "qwdialogheaders.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,8 +23,12 @@ private:
     QStandardItemModel *theModel;	// 数据模型
     QItemSelectionModel *theSelection;	//item选择模型
 
+    QWDialogHeaders *dlgSetHeaders=NULL;	//设置表格标题对话框
+
 private slots:
     void on_actTab_SetSize_triggered();
+
+    void on_actTab_SetHeader_triggered();
 
 private:
     Ui::MainWindow *ui;

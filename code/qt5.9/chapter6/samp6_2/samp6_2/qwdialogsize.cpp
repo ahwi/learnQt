@@ -1,5 +1,6 @@
 #include "qwdialogsize.h"
 #include "ui_qwdialogsize.h"
+#include <QMessageBox>
 
 QWDialogSize::QWDialogSize(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +11,7 @@ QWDialogSize::QWDialogSize(QWidget *parent) :
 
 QWDialogSize::~QWDialogSize()
 {
+    QMessageBox::information(this, "提示", "设置表格行列对话框被删除");
     delete ui;
 }
 
