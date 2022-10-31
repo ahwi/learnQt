@@ -15,6 +15,10 @@ public:
     explicit QWDialogSize(QWidget *parent = nullptr);
     ~QWDialogSize();
 
+    int rowCount();	//获取对话框输入的行数
+    int columnCount(); 	//获取对话框输入的列数
+    void setRowColumn(int row, int column);	//初始化对话框上两个SpinBox的值
+
 private:
     Ui::QWDialogSize *ui;
 };

@@ -12,3 +12,20 @@ QWDialogSize::~QWDialogSize()
 {
     delete ui;
 }
+
+
+int QWDialogSize::rowCount()
+{
+    return ui->spinBoxRow->value();
+}
+
+int QWDialogSize::columnCount()
+{
+    return ui->spinBoxColumn->value();
+}
+
+void QWDialogSize::setRowColumn(int row, int column)
+{
+    ui->spinBoxRow->setValue(row);
+    ui->spinBoxColumn->setValue(column);
+}

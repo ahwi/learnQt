@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
+#include <QItemSelectionModel>
+#include "qwdialogsize.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,6 +17,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private:
+    QStandardItemModel *theModel;	// 数据模型
+    QItemSelectionModel *theSelection;	//item选择模型
+
+private slots:
+    void on_actTab_SetSize_triggered();
 
 private:
     Ui::MainWindow *ui;
