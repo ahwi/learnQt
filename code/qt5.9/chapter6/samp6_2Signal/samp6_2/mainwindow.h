@@ -21,14 +21,15 @@ public:
     ~MainWindow();
 
 public:
-    //设置单元格的字符串
-    void setACellText(int row, int column, QString text);
 
 private:
     QStandardItemModel *theModel;	// 数据模型
     QItemSelectionModel *theSelection;	//item选择模型
 
     QWDialogHeaders *dlgSetHeaders=NULL;	//设置表格标题对话框
+
+signals:
+    void setActLocateRowColumn(int row, int column);
 
 private slots:
     void on_actTab_SetSize_triggered();
@@ -38,6 +39,11 @@ private slots:
     void on_actTab_Locate_triggered();
 
     void setActLocateEnable(bool enable);
+
+    //设置单元格的字符串
+    void setACellText(int row, int column, QString text);
+
+    void on_tableView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;

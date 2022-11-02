@@ -28,5 +28,24 @@ void QWDialogLocate::showEvent(QShowEvent *e)
 
 void QWDialogLocate::on_btnClose_clicked()
 {
-
 }
+
+void QWDialogLocate::on_btnSetText_clicked()
+{
+    int row = ui->spinBoxRow->value();
+    int column = ui->spinBoxColumn->value();
+    QString text = ui->editCaption->text();
+    if(ui->chkBoxRow->isChecked())
+        ui->spinBoxRow->setValue(1+row);
+    if(ui->chkBoxColumn->isChecked())
+        ui->spinBoxColumn->setValue(1+column);
+
+    emit setACellContent(row, column, text);
+}
+
+void QWDialogLocate::setRowColumn(int row, int column)
+{
+    ui->spinBoxRow->setValue(row);
+    ui->spinBoxColumn->setValue(column);
+}
+

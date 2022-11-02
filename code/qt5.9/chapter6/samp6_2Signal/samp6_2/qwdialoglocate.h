@@ -23,8 +23,13 @@ protected:
 private slots:
     void on_btnClose_clicked();
 
+    void on_btnSetText_clicked();
+
+    void setRowColumn(int row, int column);
+
 signals:
     void changeActionEnable(bool enable);
+    void setACellContent(int row, int column, QString text);
 
 
 private:

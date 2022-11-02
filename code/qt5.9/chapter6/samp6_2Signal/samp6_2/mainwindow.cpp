@@ -20,18 +20,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setACellText(int row, int column, QString text)
-{
-    QModelIndex index = theModel->index(row, column);
-    theSelection->clearSelection();
-    theSelection->setCurrentIndex(index, QItemSelectionModel::Select);
-    theModel->setData(index, text, Qt::DisplayRole);
-}
-
-void MainWindow::setActLocateEnable(bool enable)
-{
-    ui->actTab_Locate->setEnabled(enable);
-}
 
 void MainWindow::on_actTab_SetSize_triggered()
 {
@@ -48,6 +36,7 @@ void MainWindow::on_actTab_SetSize_triggered()
 
     delete dlgSetSize;
 }
+
 
 void MainWindow::on_actTab_SetHeader_triggered()
 {
@@ -86,10 +75,32 @@ void MainWindow::on_actTab_Locate_triggered()
     }
 
     connect(dlgLocate, SIGNAL(changeActionEnable(bool)), this, SLOT(setActLocateEnable(bool)));
+    connect(dlgLocate, SIGNAL(setACellContent(int, int, QString)), this, SLOT(setACellText(int, int, QString)));
+    connect(this, SIGNAL(setActLocateRowColumn(int, int)), dlgLocate, SLOT(setRowColumn(int, int)));
     dlgLocate->show();
 }
 
+void MainWindow::setActLocateEnable(bool enable)
+{
+    ui->actTab_Locate->setEnabled(enable);
+}
 
+void MainWindow::setACellText(int row, int column, QString text)
+{
+    QModelIndex index = theModel->index(row, column);
+    theSelection->clearSelection();
+    theSelection->setCurrentIndex(index, QItemSelectionModel::Select);
+    theModel->setData(index, text, Qt::DisplayRole);
+}
+
+
+void MainWindow::on_tableView_clicked(const QModelIndex &index)
+{
+    int row = index.row();
+    int column = index.column();
+
+    emit setActLocateRowColumn(row, column);
+}
 
 
 
