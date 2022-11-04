@@ -15,6 +15,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void paintEvent(QPaintEvent *event);
+
+private slots:
+    void on_actWidgetInsite_triggered();
+
+    void on_actWidget_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
