@@ -18,15 +18,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    qformdoc.cpp
+    qformdoc.cpp \
+    qformtable.cpp \
+    qwdialogheaders.cpp \
+    qwdialogsize.cpp
 
 HEADERS += \
     mainwindow.h \
-    qformdoc.h
+    qformdoc.h \
+    qformtable.h \
+    qwdialogheaders.h \
+    qwdialogsize.h
 
 FORMS += \
     mainwindow.ui \
-    qformdoc.ui
+    qformdoc.ui \
+    qformtable.ui \
+    qwdialogheaders.ui \
+    qwdialogsize.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

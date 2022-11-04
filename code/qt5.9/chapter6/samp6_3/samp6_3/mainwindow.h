@@ -23,6 +23,14 @@ private slots:
 
     void on_actWidget_triggered();
 
+    void on_actWindowInsite_triggered();
+
+    void on_actWindow_triggered();
+
+    void on_tabWidget_tabCloseRequested(int index);
+
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 };
