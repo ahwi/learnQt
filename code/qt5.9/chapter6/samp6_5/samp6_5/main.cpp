@@ -6,9 +6,12 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    QWMainWindow w;
-//    w.show();
     QDlgLogin d;
-    d.exec();
-    return a.exec();
+    if(d.exec() == QDialog::Accepted){
+        QWMainWindow w;
+        w.show();
+        return a.exec();
+    }
+    else
+        return 0;
 }
