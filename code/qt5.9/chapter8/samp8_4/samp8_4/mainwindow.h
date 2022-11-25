@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 #include <QLabel>
 
 QT_BEGIN_NAMESPACE
@@ -20,6 +21,7 @@ private:
     void initGraphicsSystem();	//创建Graphics View的各项
 
 private:
+    QGraphicsScene *scene;
     QLabel *labViewCord;
     QLabel *labSceneCord;
     QLabel *labItemCord;
