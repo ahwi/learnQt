@@ -58,6 +58,7 @@ void MainWindow::initGraphicsSystem()
     // 一个位于scene中心的椭圆，测试局部坐标
     QGraphicsEllipseItem *item2 = new QGraphicsEllipseItem(-100, -50, 200, 100); //矩形框内场景椭圆,绘图项的局部坐标，左上角（-100， -50），宽200，高100
     item2->setPos(0, 0);	//设置椭圆再场景中的位置，缺省位置为(0,0)
+    item2->setBrush(QBrush(Qt::blue));
     item2->setFlags(QGraphicsItem::ItemIsSelectable |
                     QGraphicsItem::ItemIsMovable |
                     QGraphicsItem::ItemIsFocusable);
