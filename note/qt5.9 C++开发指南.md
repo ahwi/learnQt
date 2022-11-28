@@ -357,5 +357,81 @@ samp8_5：一个基于Graphics View结构的简单绘图程序，通过这个实
 
 
 
+## 第9章 Qt Charts
+
+Qt Charts可以方便地绘制常见的折线图、柱状图、饼图等图表。
+
+本章主要介绍：
+
+* Qt Charts的基本特点和功能
+* 以画折线图为例详细说明Qt Charts各主要部件的操作方法
+* 介绍各种常用图标的绘图方法
+* 介绍鼠标操作图形缩放等功能的实现
+
+> Qt 5.7以前只有商业版才有Qt Charts，5.7以后社区版本也包含了Qt Charts
+
+### 9.1 Qt Charts概述
+
+#### 9.1.1 Qt Charts模块
+
+Qt Charts模块是一组易于使用的图标组件，它基于Qt的Graphics View架构，其核心组件是QChartView和QChart。
+
+* QChartView用于显示图表的视图，其父类是QGraphicsView
+
+* QChart的继承关系：
+
+  ![image-20221128194402466](qt5.9 C++开发指南.assets/image-20221128194402466.png)
+
+  * QChart是一种图形项。
+  * QPolarChart是用于绘制极坐标图的图表类。
+
+* 在项目中使用Qt Charts模块：
+
+  * 在配置文件（.pro文件）中增加下面的一行语句
+
+    ```c++
+    Qt += charts
+    ```
+
+  * 在需要使用QtCharts的类的头文件或源程序文件中，使用包含语句
+
+    ```c++
+    #include <QtCharts>
+    using namespace QtCharts;
+    ```
+
+    也可以使用宏定义
+
+    ```c++
+    #include <QtCharts>
+    Qt_CHARTS_USE_NAMESPACE
+    ```
+
+#### 9.1.2 一个简单的QChart绘图程序
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
