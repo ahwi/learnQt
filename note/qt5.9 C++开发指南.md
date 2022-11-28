@@ -345,9 +345,15 @@ QGraphicsItem类提供的图形项操作的函数
 
 <img src="qt5.9 C++开发指南.assets/image-20221128191317945.png" alt="image-20221128191317945" style="zoom: 67%;" />
 
+#### 8.3.5 Graphics View绘图程序
 
+samp8_5：一个基于Graphics View结构的简单绘图程序，通过这个实例可以发现Graphics View图形编程更多功能的使用方法。
 
+运行界面如下图所示：
 
+![image-20221128192610151](qt5.9 C++开发指南.assets/image-20221128192610151.png)
+
+其他：略
 
 
 
