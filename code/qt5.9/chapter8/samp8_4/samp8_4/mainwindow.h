@@ -17,8 +17,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void resizeEvent(QResizeEvent *event);
+
 private:
     void initGraphicsSystem();	//创建Graphics View的各项
+
+private slots:
+    void on_mouseMovePoint(QPoint point);
+    void on_mouseClicked(QPoint point);
 
 private:
     QGraphicsScene *scene;
