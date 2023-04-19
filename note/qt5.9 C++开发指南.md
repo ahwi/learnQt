@@ -81,17 +81,148 @@ QPainter主要的三个属性：
 
 > 使用这3个属性基本就控制了绘图的基本特点，当然还有一些其他的功能结合使用，比如叠加模式、旋转和缩放等功能。
 
-
-
-==============待完善========================
-
 ##### 4. 创建实例
 
-实例`samp8_1`演示:使用`paintEvent()`时间来绘图
+实例`samp8_1`演示:使用`paintEvent()`事件来绘制一个矩形
+
+```c++
+QPainter painter(this);
+painter.setRenderHint(QPainter::Antialiasing);		// 反走样
+painter.setRenderHint(QPainter::TextAntialiasing);	// 抗锯齿
+
+int w = this->width();
+int h = this->height();
+QRect rect(w/4, h/4, w/2, h/2);	// 要绘制的矩形框
+
+// 设置画笔
+QPen pen;
+pen.setWidth(3);	//线宽
+pen.setColor(Qt::red);	//线颜色
+pen.setStyle(Qt::SolidLine);	//线的类型，实线或虚线等
+pen.setCapStyle(Qt::FlatCap);	//线的端点样式
+pen.setJoinStyle(Qt::BevelJoin);	//线的连接点样式
+painter.setPen(pen);
+
+// 设置画刷
+QBrush brush;
+brush.setColor(Qt::yellow);	// 画刷颜色
+brush.setStyle(Qt::SolidPattern);	// 画刷填充样式
+painter.setBrush(brush);
+
+painter.drawRect(rect);	// 绘制图形
+```
 
 #### 8.1.2 QPen的主要功能
 
+QPen用于绘图时，对线条进行设置。
+
+主要包括：
+
+* 线宽
+* 颜色
+* 线型 等
+
+`表8-1`是 QPen 类的主要接口函数
+
+> 通常一个设置函数都有一个对应的读取函数。
+>
+> 如 setColor() 用于设置画笔颜色，对应的读取画笔颜色的函数为 color()
+
+![image-20230419230207300](qt5.9 C++开发指南.assets/image-20230419230207300.png)
+
+除了线条颜色和宽度的设置，QPen影响线条的另外3个主要属性：
+
+* 线条样式（style）
+* 端点样式（capStyle）
+* 连接样式（joinStyle）
+
+**1. 线条样式**
+
+`setStyle(Qt::PenStyle style)`
+
+Qt 定义的几种线条样式：
+
+<img src="qt5.9 C++开发指南.assets/image-20230419230626740.png" alt="image-20230419230626740" style="zoom:50%;" />
+
+也可以自定义线条样式（需要用到 `setDashOffset()`和`setDashPattern()`函数）
+
+**2. 线条端点样式**
+
+`setCapStyle(Qt::PenCapStyle style)`
+
+Qt dinginess的几种线条端点样式：
+
+![image-20230419231016706](qt5.9 C++开发指南.assets/image-20230419231016706.png)
+
+**3. 线条连接样式**
+
+`setJoinStyle(Qt::PenJoinStyle style)`
+
+Qt 定义的几种线条连接样式：
+
+![image-20230419231149946](qt5.9 C++开发指南.assets/image-20230419231149946.png)
+
 #### 8.1.3 QBrush的主要功能
+
+QBrush 定义了 QPainter 绘图时的填充特性，包括：
+
+* 填充颜色
+* 填充样式
+* 材质填充时的材质图片等
+
+主要函数见`表 8-2`
+
+![image-20230419232845334](qt5.9 C++开发指南.assets/image-20230419232845334.png)
+
+**设置画刷样式**
+
+`setStyle(Qt::BrushStyle style)` 用于设置画刷样式。
+
+参数是`Qt::BrushStyle`枚举，该枚举类型典型的几种取值见 `表8-3`
+
+![image-20230419233308267](qt5.9 C++开发指南.assets/image-20230419233308267.png)
+
+渐变填充需要使用专门的类作为Brush赋值给QPainter。
+
+下面是`Qt::BrushStyle` 几种样式填充
+
+<img src="qt5.9 C++开发指南.assets/image-20230419233450781.png" alt="image-20230419233450781" style="zoom:50%;" />
+
+实例：`samp8_1`
+
+用材质图片填充一个矩形
+
+```c++
+QPainter painter(this);
+painter.setRenderHint(QPainter::Antialiasing);	// 反走样
+painter.setRenderHint(QPainter::TextAntialiasing);	// 抗锯齿
+
+int w = this->width();
+int h = this->height();
+QRect rect(w/4, h/4, w/2, h/2);	//要绘制的矩形
+
+QPen pen;
+pen.setWidth(3);	// 线宽
+pen.setColor(Qt::red);	// 线颜色
+pen.setStyle(Qt::SolidLine);		// 线的类型
+pen.setCapStyle(Qt::FlatCap);		// 线的端点样式
+pen.setJoinStyle(Qt::BevelJoin);	// 线的连接点样式
+painter.setPen(pen);
+
+// 设置画刷
+QPixmap texturePixmap(":images/images/texture.jpg");
+
+QBrush brush;
+brush.setStyle(Qt::TexturePattern); // 设置填充样式
+brush.setTexture(texturePixmap); // 设置材质图片
+painter.setBrush(brush);
+
+painter.drawRect(rect);	// 绘制图形
+```
+
+
+
+
 
 #### 8.1.4 渐变填充
 
@@ -423,9 +554,17 @@ Qt Charts模块是一组易于使用的图标组件，它基于Qt的Graphics Vie
 
 
 
+## 扩展
 
+### 1. 反走样与抗锯齿
 
+```c++
+    painter.setRenderHint(QPainter::Antialiasing);	// 开启反走样功能
+    painter.setRenderHint(QPainter::TextAntialiasing); // 开启抗锯齿功能
+```
 
+反走样（Anti-Aliasing，简称AA）是处理渲染失真问题的手段，通常会与锯齿联系密切，因此也被称为“抗锯齿”。
+在计算机图形学中，走样是指在显示器上绘制非水平且非垂直的直线或多边形边界时，或多或少会呈现锯齿状或台阶状外观。反走样技术是一种通过对图像进行处理来减少锯齿现象的技术。
 
 
 
