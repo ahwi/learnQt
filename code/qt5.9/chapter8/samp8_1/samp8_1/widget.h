@@ -17,9 +17,10 @@ public:
 
 private:
     void myDrawFilleRect();
-protected:
-    void    paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void myDrawTextureRect();
+    void myDrawGradient();
+protected:
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 private:
     Ui::Widget *ui;

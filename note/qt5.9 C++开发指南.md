@@ -220,11 +220,65 @@ painter.setBrush(brush);
 painter.drawRect(rect);	// 绘制图形
 ```
 
-
-
-
-
 #### 8.1.4 渐变填充
+
+<font color=red>使用渐变填充需要用渐变类的对象作为Painter的brush。</font>
+
+**有3个实现渐变填充的类：**
+
+* `QLinearGradient`：线性渐变。指定一个起点及其颜色，终点及其颜色，还可以指定中间的某个颜色点的颜色。起点至终点之间的颜色会线性插值计算，得到线性渐变的填充颜色。
+* `QRadialGradient`：有简单辐射渐变和扩展辐射渐变两种方式。简单辐射渐变是在一个圆内的一个焦点和一个端点之间生成渐变颜色，扩展辐射渐变是在一个焦点圆和一个中心圆之间生成渐变色。
+* `QConicalGradient`：圆锥型渐变，围绕一个中心点逆时针生成渐变颜色。
+
+![image-20230421202321105](qt5.9 C++开发指南.assets/image-20230421202321105.png)
+
+**设置延展方式**
+
+用`QGradient`类的`setSpread(QGradient::Spread methodd)`函数设置延展方式。
+
+3种延展方式的效果：
+
+* `PadSpread` 模式是用结束点的颜色填充外部区域，这是缺省的方式。
+* `RepeatSpread` 模式是重复使用渐变方式填充外部区域。
+* `ReflectSpread` 是反射式重复使用渐变方式填充外部区域。
+
+> `setSpread()` 对圆锥形渐变不起作用
+
+ ![image-20230421203158900](qt5.9 C++开发指南.assets/image-20230421203158900.png)
+
+**实例：渐变效果绘图**
+
+<img src="qt5.9 C++开发指南.assets/image-20230421221316120.png" alt="image-20230421221316120" style="zoom:33%;" />
+
+```c++
+QPainter painter(this);
+int w = this->width();
+int h = this->height();
+QRect rect(w/4, h/4, w/2, h/2);	// 中间区域矩形框
+// 径向渐变
+QRadialGradient radialGrad(w/2, h/2, qMax(w/8, h/8), w/2, h/2);
+radialGrad.setColorAt(0, Qt::green);
+radialGrad.setColorAt(1, Qt::blue);
+radialGrad.setSpread(QGradient::ReflectSpread);
+painter.setBrush(radialGrad);
+
+// 绘图
+painter.drawRect(this->rect());
+```
+
+上面代码定义`QRadialGradient`对象时，使用的构造函数原先是：
+
+```c++
+QRadialGradient(qreal cx,  qreal cy, qreal radius, qreal fx, qreal fy)
+```
+
+* `(cx,cy)`是辐射填充的中心点，程序中设置为`(w/2, h/2)`，也就是Widget窗口的中心
+* radius 是辐射填充区的半径，程序中设置为`qMax(w/8, h/8)`
+* `(fx, fy)`是焦点坐标，程序中设置为(w/2, h/2)
+
+
+
+
 
 #### 8.1.5 QPainter绘制基本图形元件
 
