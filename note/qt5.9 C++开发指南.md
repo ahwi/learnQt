@@ -276,11 +276,9 @@ QRadialGradient(qreal cx,  qreal cy, qreal radius, qreal fx, qreal fy)
 * radius 是辐射填充区的半径，程序中设置为`qMax(w/8, h/8)`
 * `(fx, fy)`是焦点坐标，程序中设置为(w/2, h/2)
 
-
-
-
-
 #### 8.1.5 QPainter绘制基本图形元件
+
+TODO：待完成
 
 ### 8.2 坐标系统和坐标变换
 
@@ -288,10 +286,10 @@ QRadialGradient(qreal cx,  qreal cy, qreal radius, qreal fx, qreal fy)
 
 ![image-20221121091004788](qt5.9 C++开发指南.assets/image-20221121091004788.png)
 
-* QPainter在窗口上绘图的默认坐标系统如图8-1所示，这是绘图设备的物理坐标
-* 为了绘图的方便，QPainter提供了一些坐标变换的功能，通过平移、旋转等坐标变换，得到一个逻辑坐标系统
+* QPainter在窗口上绘图的默认坐标系统如图8-1所示，这是绘图设备的<font color=red>物理坐标</font>
+* 为了绘图的方便，QPainter提供了一些坐标变换的功能，通过平移、旋转等坐标变换，得到一个<font color=red>逻辑坐标系统</font>
 
-坐标变换函数见表8-5：
+<font color=red>坐标变换函数</font>见表8-5：
 
 ![image-20221122143433764](qt5.9 C++开发指南.assets/image-20221122143433764.png)
 
@@ -341,7 +339,92 @@ sx,sy分别为横向和纵向缩放比例，比例大于1是放大，小于1是�
 
 ##### 1. 绘制3个五角星的程序
 
-略
+![image-20230422125751338](qt5.9 C++开发指南.assets/image-20230422125751338.png)
+
+实例：`samp8_2`
+
+```c++
+void Widget::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+
+    QPainter painter(this);	//创建painter对象
+
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+
+    //生成五角星的5个顶点，假设原点在五角星中心
+    qreal r = 100;	// 半径
+    const qreal Pi = 3.14159;
+    qreal deg = Pi*72/180;	// 角度转成弧度：将72度转成弧度
+
+    QPoint points[5] = {
+        QPoint(r, 0),
+        QPoint(r*qCos(deg), -r*qSin(deg)),
+        QPoint(r*qCos(2*deg), -r*qSin(2*deg)),
+        QPoint(r*qCos(3*deg), -r*qSin(3*deg)),
+        QPoint(r*qCos(4*deg), -r*qSin(4*deg)),
+    };
+
+    // 设置字体
+    QFont font;
+    font.setPointSize(12);
+    font.setBold(true);
+    painter.setFont(font);
+
+    // 设置画笔
+    QPen penLine;
+    penLine.setWidth(2); // 线宽
+    penLine.setColor(Qt::blue);	// 划线颜色
+    penLine.setStyle(Qt::SolidLine); // 线的类型
+    penLine.setCapStyle(Qt::FlatCap); // 线端点样式
+    penLine.setJoinStyle(Qt::BevelJoin); // 线的连接点样式
+    painter.setPen(penLine);
+
+    // 设置画刷
+    QBrush brush;
+    brush.setColor(Qt::yellow);
+    brush.setStyle(Qt::SolidPattern); // 画刷填充样式
+    painter.setBrush(brush);
+
+    // 设计绘制五角星的PainterPath，以便重复使用
+    QPainterPath starPath;
+    starPath.moveTo(points[0]);
+    starPath.lineTo(points[2]);
+    starPath.lineTo(points[4]);
+    starPath.lineTo(points[1]);
+    starPath.lineTo(points[3]);
+    starPath.closeSubpath();	// 闭合路径，最后一个点与第一个点相连
+
+    starPath.addText(points[0], font, "0");
+    starPath.addText(points[1], font, "1");
+    starPath.addText(points[2], font, "2");
+    starPath.addText(points[3], font, "3");
+    starPath.addText(points[4], font, "4");
+
+    // 绘图
+    painter.save();	// 保存坐标状态
+    painter.translate(100, 120); // 平移
+    painter.drawPath(starPath); // 画星星
+    painter.drawText(0, 0, "S1");
+
+    painter.restore(); // 恢复上一次坐标状态
+
+    painter.translate(300, 120); // 平移
+    painter.scale(0.8, 0.8); // 缩放
+    painter.rotate(90); // 顺时针旋转
+    painter.drawPath(starPath); // 画星星
+    painter.drawText(0, 0, "S2");
+
+    painter.resetTransform(); // 复位所有坐标变换
+    painter.translate(500, 120); // 平移
+    painter.rotate(-145); // 逆时针旋转
+    painter.drawPath(starPath); // 画星星
+    painter.drawText(0, 0, "S3");
+}
+```
+
+
 
 ##### 2. 绘制五角星的PainterPath的定义
 
