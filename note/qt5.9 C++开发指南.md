@@ -445,7 +445,7 @@ void Widget::paintEvent(QPaintEvent *event)
 
 * 窗口
 
-  * 与视口是同一个矩形，只不过是用逻辑坐标定义的坐标系。
+  * <font color=red>与视口是同一个矩形</font>，只不过是用逻辑坐标定义的坐标系。
 
   * 窗口可以直接定义矩形区的逻辑坐标范围。
 
@@ -465,11 +465,57 @@ void Widget::paintEvent(QPaintEvent *event)
 
 ##### 2. 视口和窗口的使用实例
 
-略
+<font color=red>使用窗口坐标的优点：</font>
+
+只需要按照窗口定义来绘图，而不用管实际的物理坐标范围的大小。
+
+例如：在一个固定边长100的正方形窗口内绘图，当实际绘图设备大小变换时，绘制的图形会自动变换大小。这样，就可以将绘图功能与绘图设备隔离开来，使绘图功能适用于不同大小、不同类型的设备。
+
+示例：`samp8_3`演示了使用视口和窗口的方法。
+
+<img src="assets/image-20230423154034160.png" alt="image-20230423154034160" style="zoom:50%;" />
+
+```c++
+void Widget::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+
+    int w = width();
+    int h = height();
+    int side = qMin(w, h); // 取长和宽的小值
+
+    QRect rect((w-side)/2, (h-side)/2, side, side);  // viewport 矩形区
+    painter.drawRect(rect);  // viewport大小
+
+    painter.setViewport(rect);	// 设置 viewport
+    painter.setWindow(-100, -100, 200, 200);  // 设置窗口大小，逻辑坐标
+
+    // 设置画笔
+    QPen pen;
+    pen.setWidth(1); // 线宽
+    pen.setColor(Qt::red); // 划线颜色
+    pen.setStyle(Qt::SolidLine); // 线的类型
+    pen.setCapStyle(Qt::FlatCap); // 线端点样式
+    pen.setJoinStyle(Qt::BevelJoin); // 线的连接点样式
+    painter.setPen(pen);
+
+    // 线性渐变
+    QLinearGradient linearGrad(0, 0, 100, 0); // 从左到右
+    linearGrad.setColorAt(0, Qt::yellow); // 起点颜色
+    linearGrad.setColorAt(1, Qt::green); // 终点颜色
+    linearGrad.setSpread(QGradient::PadSpread);  // 扩展方式
+    painter.setBrush(linearGrad);
+
+    painter.drawEllipse(QPoint(50, 0), 50, 50);
+}
+```
 
 #### 8.2.4 绘图叠加的效果
 
-略
+只是添加不同的填充和叠加效果，先略过。
 
 ### 8.3 Graphics View绘图架构
 
