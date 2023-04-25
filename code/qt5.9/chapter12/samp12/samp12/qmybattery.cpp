@@ -65,7 +65,41 @@ void QmyBattery::paintEvent(QPaintEvent *event)
     painter.drawText(55-textRect.width()/2, 23+textRect.height()/2, powStr);
 }
 
-void setPowerLevel(int pow)
+void QmyBattery::setPowerLevel(int pow)
 {
-
+    //设置当前电量值
+    mPowerLevel = pow;
+    emit powerLevelChanged(pow); // 发射信号
+    repaint();
 }
+
+int QmyBattery::powerLevel()
+{
+    //返回当前电量值
+    return mPowerLevel;
+}
+
+void QmyBattery::setWarnLevel(int warn)
+{
+    //设置电量低阈值
+    mWarnLevel = warn;
+    repaint();
+}
+
+int QmyBattery::warnLevel()
+{
+    //返回电量低阈值
+    return mWarnLevel;
+}
+
+
+QSize QmyBattery::sizeHint()
+{
+    // 缺省大小，调整比例
+    int h = this->height();
+    int w = h*12/5;
+    QSize size(w, h);
+    return size;
+}
+
+

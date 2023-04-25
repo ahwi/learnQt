@@ -10,13 +10,14 @@ public:
     explicit QmyBattery(QWidget *parent = nullptr);
 
 signals:
+    void powerLevelChanged(int); // 发射信号
 
 public:
-//    void setPowerLevel(int pow);	//设置当前电量
-//    int powerLevel();
-//    void setWarnLevel();			//设置电量低阈值
-//    int warnLevel();
-//    QSize sizeHint();				//缺省大小
+    void setPowerLevel(int pow);	//设置当前电量
+    int powerLevel();
+    void setWarnLevel(int warn);			//设置电量低阈值
+    int warnLevel();
+    QSize sizeHint();				//缺省大小
 
 protected:
     void paintEvent(QPaintEvent *event);
