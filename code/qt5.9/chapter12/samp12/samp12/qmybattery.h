@@ -11,6 +11,16 @@ public:
 
 signals:
 
+public:
+//    void setPowerLevel(int pow);	//设置当前电量
+//    int powerLevel();
+//    void setWarnLevel();			//设置电量低阈值
+//    int warnLevel();
+//    QSize sizeHint();				//缺省大小
+
+protected:
+    void paintEvent(QPaintEvent *event);
+
 private:
     QColor mColorBack = Qt::white;		//背景颜色
     QColor mColorBorder = Qt::black;	//电池边框颜色
