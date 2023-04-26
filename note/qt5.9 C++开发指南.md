@@ -752,7 +752,44 @@ Qt Charts模块是一组易于使用的图标组件，它基于Qt的Graphics Vie
 
 
 
+## 第14章 网络编程
 
+Qt网络模块提供了用于编写 TCP/IP 客户端和服务器端程序的各种类。如：
+
+* 用于TCP通信的QTcpSocket和QTcpServer
+* 用于UDP通信的QUdpSocket
+* 用于实现HTTP、FTP等普通网络协议的高级类，如QNetworkRequest、QNetworkReply和QNetworkAccessManager
+* 用于网络代理、网络承载管理的类
+* 基于安全套接字层（Secure Sockets Layer，SSL）协议的安全网络通信的类
+
+本章主要介绍：
+
+* 基本的TCP和UDP网络通信类的使用
+* 基于HTTP的网络下载管理的实现
+
+要在程序中使用Qt网络模块，添加配置：
+
+`Qt += network`
+
+### 14.1 主机信息查询
+
+#### 14.1.1 QHostInfo和QNetworkInterface类
+
+QHostInfo和QNetworkInterface类可以用于查询主机的MAC地址或IP地址。
+
+QHostInfo类主要的功能函数：
+
+![image-20230426221423586](qt5.9 C++开发指南.assets/image-20230426221423586.png)
+
+QNetworkInterface类的主要功能函数：
+
+![image-20230426221540446](qt5.9 C++开发指南.assets/image-20230426221540446.png)
+
+**实例：演示这两个类的主要功能**
+
+`samp14_1`：创建一个窗口基于QDialog的应用程序，如下图所示
+
+![image-20230426221806677](qt5.9 C++开发指南.assets/image-20230426221806677.png)
 
 
 
