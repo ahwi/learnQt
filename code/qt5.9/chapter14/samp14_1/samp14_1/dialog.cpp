@@ -54,3 +54,46 @@ QString Dialog::protocolName(QAbstractSocket::NetworkLayerProtocol protocol)
             return "Unknow Network Layer Protocol";
     }
 }
+
+// 查找主机信息
+void Dialog::on_btnLookup_clicked()
+{
+    QString hostname = ui->editHost->text();
+    QHostInfo::lookupHost(hostname, this, SLOT(lookedUp(QHostInfo)));
+
+}
+
+//查找主机信息的槽函数
+void Dialog::lookedUp(const QHostInfo &host)
+{
+    if (host.error() != QHostInfo::NoError) {
+          ui->plainTextEdit->appendPlainText("Lookup failed:" + host.errorString());
+          return;
+      }
+    QList<QHostAddress> addList = host.addresses();
+    for(int i = 0; i < addList.count(); i++){
+        QHostAddress aHost = addList.at(i);
+        bool show = ui->chkOnlyIPv4->isChecked(); //是否只显示IPv4
+        if(show)
+            show = (QAbstractSocket::IPv4Protocol == aHost.protocol()); // 协议类型是否为IPVk4
+        else
+            show = true;
+        if(show){
+            ui->plainTextEdit->appendPlainText("协议：" + protocolName(aHost.protocol())); //协议类型
+            ui->plainTextEdit->appendPlainText("本机IP地址：" + aHost.toString());	// IP地址
+            ui->plainTextEdit->appendPlainText("");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+

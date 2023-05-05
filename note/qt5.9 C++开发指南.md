@@ -791,6 +791,116 @@ QNetworkInterface类的主要功能函数：
 
 ![image-20230426221806677](qt5.9 C++开发指南.assets/image-20230426221806677.png)
 
+#### 14.1.2 QHostInfo的使用
+
+##### 1. 显示本机地址信息
+
+```c++
+void Dialog::on_btnGetHostInfo_clicked()
+{
+    // QHostInfo获取主机信息
+    QString hostName = QHostInfo::localHostName();	//本地主机名
+    ui->plainTextEdit->appendPlainText("本地主机名：" + hostName + "\n");
+
+    QHostInfo hostInfo = QHostInfo::fromName(hostName);
+
+    QList<QHostAddress> addList = hostInfo.addresses();	// IP地址列表
+    for(int i=0;i<addList.count(); i++){
+        QHostAddress aHost = addList.at(i);	//每一项是一个QHostAddress
+        bool show = ui->chkOnlyIPv4->isChecked();	//是否只显示IPv4
+        if(show)
+            show = (QAbstractSocket::IPv4Protocol == aHost.protocol()); //协议类型是否为IPv4
+        else
+            show = true;
+        if(show){
+            ui->plainTextEdit->appendPlainText("协议：" + protocolName(aHost.protocol())); //协议类型
+            ui->plainTextEdit->appendPlainText("本机IP地址：" + aHost.toString()); //IP地址
+            ui->plainTextEdit->appendPlainText("");
+        }
+    }
+}
+```
+
+* `QHostInfo::localHostName()`获取主机名hostName，然后再使用主机名作为参数，用`QHostInfo::fromName(hostName)`获取主机的信息 hostInfo
+
+* `QHostInfo`的方法`addresses()`返回主机的IP地址列表
+
+  `QList<QHostAddress> addList = hostInfo.addresses()`
+
+  `QHostAddress`类提供了一个IP地址的信息，包括IPv4地址和IPv6地址
+
+  * `protocol()`返回`QAbstractSocket::NetworkLayerProtol`类型变量，表示当前IP地址的协议类型。
+
+    ![image-20230505233845303](qt5.9 C++开发指南.assets/image-20230505233845303.png)
+
+  * `toString()`返回IP地址的字符串
+
+* 自定义了一个函数`protocolName()`，用以返回协议类型对应的名称
+
+  ```c++
+  QString Dialog::protocolName(QAbstractSocket::NetworkLayerProtocol protocol)
+  {
+      switch (protocol) {
+          case QAbstractSocket::IPv4Protocol:
+              return "IPv4 Protocol";
+          case QAbstractSocket::IPv6Protocol:
+              return "IPv6 Protocol";
+          case QAbstractSocket::AnyIPProtocol:
+              return "Any IP Protocol";
+          default:
+              return "Unknow Network Layer Protocol";
+      }
+  }
+  ```
+
+##### 2. 查找主机地址信息
+
+QHostInfo的静态函数`lookupHost()`可以根据主机名、域名或IP地址查找主机的地址信息，`lookupHost()`函数原型如下：
+
+```c++
+int QHostInfo::lookupHost(const QString &name, QObject *receiver, const char *member)
+```
+
+* name：是表示主机名的字符串，可以是一个主机名、一个域名、或者是一个IP地址
+* receiver和member指定一个响应槽函数的接收者和槽函数名称。
+
+`lookupHost()`以异步的方式查找主机地址。
+
+```c++
+// 查找主机信息
+void Dialog::on_btnLookup_clicked()
+{
+    QString hostname = ui->editHost->text();
+    QHostInfo::lookupHost(hostname, this, SLOT(lookedUp(QHostInfo)));
+
+}
+
+//查找主机信息的槽函数
+void Dialog::lookedUp(const QHostInfo &host)
+{
+    if (host.error() != QHostInfo::NoError) {
+          ui->plainTextEdit->appendPlainText("Lookup failed:" + host.errorString());
+          return;
+      }
+    QList<QHostAddress> addList = host.addresses();
+    for(int i = 0; i < addList.count(); i++){
+        QHostAddress aHost = addList.at(i);
+        bool show = ui->chkOnlyIPv4->isChecked(); //是否只显示IPv4
+        if(show)
+            show = (QAbstractSocket::IPv4Protocol == aHost.protocol()); // 协议类型是否为IPVk4
+        else
+            show = true;
+        if(show){
+            ui->plainTextEdit->appendPlainText("协议：" + protocolName(aHost.protocol())); //协议类型
+            ui->plainTextEdit->appendPlainText("本机IP地址：" + aHost.toString());	// IP地址
+            ui->plainTextEdit->appendPlainText("");
+        }
+    }
+}
+```
+
+
+
 
 
 ## 扩展

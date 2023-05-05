@@ -22,6 +22,10 @@ public:
 private slots:
     void on_btnGetHostInfo_clicked();
 
+    void on_btnLookup_clicked();
+
+    void lookedUp(const QHostInfo &host);
+
 private:
     Ui::Dialog *ui;
 };
