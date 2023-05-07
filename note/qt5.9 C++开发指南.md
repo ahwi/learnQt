@@ -899,6 +899,218 @@ void Dialog::lookedUp(const QHostInfo &host)
 }
 ```
 
+### 14.2 TCP通信
+
+#### 14.2.1 TCP通信概述
+
+TODO
+
+#### 14.2.2 TCP服务端程序设计
+
+TODO
+
+#### 14.2.3 TCP客户端程序设计
+
+TODO
+
+
+
+### 14.3 QUdpSocket实现UDP通信
+
+#### 14.3.1 UDP 通信概述
+
+![image-20230507165418438](qt5.9 C++开发指南.assets/image-20230507165418438.png)
+
+UDP（User Datagram Protocol，用户数据报协议）是轻量级的、不可靠的、面向数据报（datagram）、无需连接的协议，它可以用于对可靠性要求不高的场合。
+
+与TCP通信的不同：
+
+* UDP通信无需预先建立持久的socket连接
+* UDP每次发送数据报都需要指定目标地址和端口
+* UDP消息传递有三种模式：单播、广播、多播；TCP通信只有单播模式
+* 在单播、广播和多播模式下，UDP程序都是对等的，不像TCP通信那样分为客户端和服务器端。
+
+QUdpSocket 类：
+
+* 用于实现UDP通信
+* 从QAbstractSocket类继承
+  * QUdpSocket没有定义新的信号
+  * 但定义了较多新的功能函数用于实现UDP特有的功能，如数据报读写和多播通信功能
+* 以数据报传输数据，而不是以连续的数据流。
+* UDP数据发送：
+  * 发送数据报函数`QUdpSocket::writeDatagram()`
+  * 数据报的长度一般少于512字节
+  * 每个数据报包含发送者和接收者的IP地址和端口号等信息。
+* UDP数据接收：
+  * 用`QUdpSocket::bind()`函数线绑定一个端口，用于接收传入的数据报。
+  * 有数据报传入时会发射`readyRead()`信号
+  * 使用`readDatagram()`函数来读取接收到的数据报
+
+**UDP消息传送的三种模式**
+
+![image-20230507170029442](qt5.9 C++开发指南.assets/image-20230507170029442.png)
+
+* 单播（unicast）模式
+
+  一个UDP客户端发出的数据报只发送到另一个指定地址和端口的UDP客户端，是一对一的数据传输。
+
+* 广播（broadcast）模式
+
+  一个UDP客户端发出的数据报，在同一网络范围内其他所有的UDP客户端都可以收到。
+
+  * QUdpSocket支持IPv4广播
+  * 广播经常用于实现网络发现的协议。
+  * 要获取广播数据只需要在数据报中指定接收端地址为QHostAddress::Broadcast，一般的广播地址是`255.255.255.255`
+
+* 组播（multicast）模式（也称为多播）
+
+  UDP客户端加入到另一个组播IP地址指定的多播组，成员向组播地址发送的数据报组内成员都可以接收到，类似于QQ群的功能。
+
+  * `QUdpSocket::joinMulticastGroup()`函数实现加入多播组的功能
+  * 加入多播组后，UDP数据的收发与正常的UDP收发方法一样
+
+**QUdpSocket类的主要接口函数**
+
+![image-20230507171052358](qt5.9 C++开发指南.assets/image-20230507171052358.png)
+
+
+
+本节的两个实例：
+
+* `Samp14_3`：演示UDP单播和广播通信
+* `Samp14_4`：演示UDP组播通信
+
+#### 14.3.2 UDP单播和广播
+
+TODO
+
+#### 14.3.3 UDP组播
+
+TODO
+
+### 14.4 基于HTTP协议的网络应用程序
+
+#### 14.4.1 实现高层网络操作的类
+
+Qt 网络模块提供了一些类实现 OSI 7层网络模型中高层的网络协议，如HTTP、FTP、SNMP等，这些类主要是：
+
+* QNetworkRequest 类
+
+  通过一个URL地址发起网络协议请求，也保存网络请求的消息，目前支持HTTP、FTP和局部文件URLs的下载和上传。
+
+* QNetworkAccessManager 类
+
+  用于协调网络操作。在QNetworkRequest发起一个网络请求后，QNetworkAccessManager类负责发送网络请求，创建网络响应。
+
+* QNetworkReply 类
+
+  表示网络请求的响应。
+
+  * 由QNetworkAccessManager 在发送一个网络请求后创建一个网络响应。
+  * QNetworkReply 提供的信号 finished()、readyRead()和 downloadProgress()可以监测网络响应的执行情况，执行相应操作。
+  * QNetWorkReply 是 QIODevice的子类，所以 QNetworkReply支持流读写功能，也支持异步或同步工作模式。
+
+#### 14.4.2 基于HTTP协议的网络文件下载
+
+基于上述三个类，设计一个基于HTTP协议的网络下载程序
+
+![image-20230507175413494](qt5.9 C++开发指南.assets/image-20230507175413494.png)
+
+功能：
+
+* 在URL地址编辑框里数据一个网络文件URL地址，设置下载文件保存路径后，单击“下载”按钮就可以开始下载文件到设置的目录下。
+* 进度条可以显示文件下载进度，下载完成后还可以用缺省的软件打开下载的文件。
+* URL里的HTTP地址可以是任何类型的文件，如html、pdf、doc、exe等
+
+**实现**
+
+`samp14_5`
+
+TODO
+
+## 第15章 多媒体
+
+多媒体功能指的主要是计算机的音频和视频的输入、输出、显示和播放等功能。
+
+Qt的多媒体模块为音频和视频播放、录音、摄像头拍照和录像等提供支持，还提供数字收音机的支持。
+
+### 15.1 Qt 多媒体模块功能概述
+
+Qt多媒体模块提供了很多类，可以实现如下的一些功能：
+
+* 访问元素音频设备进行输入或输出
+* 低延迟播放音效文件，如WAV文件
+* 使用播放列表播放压缩的音频和视频文件，如mp3、wmv等
+* 录制声音并且压制文件
+* 使用摄像头进行预览、拍照和视频录制
+* 音频文件解码到内存进行处理
+* 录制音频或视频时，访问其视频帧或音频缓冲区
+* 数字广播调谐和收听
+
+要在c++项目中使用Qt多媒体模块，需要在项目配置文件中添加如下一行语句：
+
+`Qt += multimedia`
+
+在项目中使用视频播放功能，还需要加入下面的一行，以使用QVideoWidget或QGraphicsVideoItem进行视频播放：
+
+`Qt += multimediawidgets`
+
+**Qt多媒体模块包括多个类**
+
+![image-20230507193531034](qt5.9 C++开发指南.assets/image-20230507193531034.png)
+
+![image-20230507193544472](qt5.9 C++开发指南.assets/image-20230507193544472.png)
+
+### 15.2 音频播放
+
+#### 15.2.1 使用QMediaPlayer播放音乐文件
+
+##### 1. 音频播放器实例程序
+
+QMediaPlayer
+
+* 可以播放经过压缩的音频或视频文件，如mp3、mp4、wmv等文件
+* 可以播放单个文件
+* 可以和QMediaPlaylist类结合，对一个播放列表进行播放
+
+**QMediaPlayer的主要公共函数和槽函数：**
+
+![image-20230507194133107](qt5.9 C++开发指南.assets/image-20230507194133107.png)
+
+* 反应播放状态或文件信息的信号
+
+  * `stateChanged(QMediaPlayer::State state)` 信号
+
+    * 在调用play()、pause()和stop()函数时发射，反应播放器当前的状态。
+    * 枚举类型`QMediaPlayer::State`有3种取值，表示播放器的状态：
+      * `QMediaPlayer::StoppedState`：停止状态
+      * `QMediaPlayer::PlayingState`：正在播放
+      * `QMediaPlayer::PausedState`：暂停播放状态
+
+  * `durationChanged(qint64 duration)` 信号
+
+    在文件的事件长度变化时发射，一般在切换播放文件时发射
+
+  * `positionChanged(qint64 position)` 信号
+
+    当前文件播放位置变化时发射，可以反映文件播放进度
+
+* 通过`setMedia()`函数设置播放单个文件，也可以通过`setPlaylist()`函数设置一个QMediaPlaylist类实例表示的播放列表，对列表文件进行播放，并且自动播放下一个文件，或循环播放等。
+
+* QMediaPlayer 播放的文件可以是本地文件，也可以是网络上的文件。
+
+* QMediaPlaylist 记录播放媒体文件信息，可以添加、移除文件，也可以设置循环播放形式，在列表文件中自动切换文件。在当前播放文件切换时会发射`currentIndexChanged()`信号和`currentMediaChange()`信号
+
+##### 2. 界面设计与主窗口类的定义
+
+![image-20230507195820007](qt5.9 C++开发指南.assets/image-20230507195820007.png)
+
+实例程序`samp15_1`：使用QMediaPlayer和QMediaPlaylist实现一个音乐播放器：
+
+* 界面基于QMainWindow
+* 主窗口上删除了菜单栏、工具栏和状态栏
+* 中间是一个QListWidget组件显示播放列表的文件名
+
 
 
 
