@@ -1113,6 +1113,22 @@ QMediaPlayer
 
 
 
+### 15.4 视频播放
+
+#### 15.4.1 在QVideoWidget上播放视频
+
+
+
+##### 遇到的问题
+
+```txt
+DirectShowPlayerService::doRender: Unresolved error code 0x80040266 ()
+```
+
+原因：Qt 中的多媒体播放，底层是使用 DirectShowPlayerService，所以安装一个 DirectShow 解码器，例如 LAV Filters，就可以解决运行出错问题。
+
+解决方法：下载并安装 LAVFilters：https://github.com/Nevcairiel/LAVFilters/releases
+
 
 
 ## 扩展
