@@ -174,6 +174,152 @@ Qt Creator 创建的项目编译后的可执行文件具有默认的图标。
 
 略
 
+## 第4章 常用界面设计组件
+
+### 4.1 字符串与输入输出
+
+`samp4_1`
+
+<img src="assets/image-20230923160513911.png" alt="image-20230923160513911" style="zoom:50%;" />
+
+​															图4-1：编辑状态时的界面
+
+**QLabel和QLineEdit**
+
+QLabel用于显示字符串，QLineEdit用于显示和输入字符串
+
+这两个类都有两个函数，用于读取和设置显示文字
+
+```cpp
+QSting text() const;
+void setText(const QString &);
+```
+
+**布局**
+
+界面设计使用了布局管理：上方的几个组件是一个GridLayout，下方的9个组件也是一个GridLayout，两个GridLayout，两个GridLayout和中间一个VerticalSpacer又组成一个VerticalLayout。
+
+在布局时，要巧妙运用VerticalSpacer和HorizontalSpacer，还要会设置组件的MaximumSize和MinimumSize属性，已取得期望的布局效果。
+
+例如，在图4-1中，两个GridLayout之间放了一个垂直方向的分隔，当窗体变大时，两个GridLayout的高度并不会发生变化；而如果不放置这个垂直分隔，两个GridLayout的高度都会发生变化，GridLayout内部组件的垂直距离会发生变化。
+
+**普通数值与字符串之间的转换**
+
+略
+
+**进制转换**
+
+略
+
+### 4.1.2 QString 的常用功能
+
+<img src="assets/image-20230923165152597.png" alt="image-20230923165152597" style="zoom:50%;" />
+
+​											图 4-2 QString 函数功能测试实例 `samp4_2`
+
+QString 存储字符串采用的是Unicode码，每个字符是一个16位的QChar，而不是8位的char，所以QString处理中文字符没有问题，而且一个汉字算作是一个字符。
+
+**函数的使用方法**
+
+略
+
+### 4.2 SpinBox的使用
+
+<img src="assets/image-20230923172226935.png" alt="image-20230923172226935" style="zoom:50%;" />
+
+**QSpinBox和QDoubleSpinBox的简介**
+
+* QSpinBox 用于整数的显示和输入，一般显示十进制数，也可以显示二进制、十六进制的数，而且可以在显示框中增加前缀和后缀
+* QDoubleSpinBox 用于浮点数的显示和输入，可以设置显示小数位数，也可以设置显示的前缀和后缀。
+
+**QSpinBox和QDoubleSpinBox的主要属性**
+
+QSpinBox和QDoubleSpinBox都是QAbstractSpinBox的子类，具有大多数相同的属性，只是参数不同。
+
+QSpinBox和QDoubleSpinBox的主要属性：
+
+![image-20230923172816938](assets/image-20230923172816938.png)
+
+### 4.3 其他数值输入和显示组件
+
+<img src="assets/image-20230923174339121.png" alt="image-20230923174339121" style="zoom:50%;" />
+
+​												图4-4 `samp4_4`的设计界面
+
+在这个实例中，用到如下一些组件：
+
+* QSlider：滚动条，通过滑动来设置数值，可用于数值输入。实例中使用4个滑动条输入红、绿、蓝三色和Alpha值，然后合成颜色，作为一个QTextEdit组件的底色。
+* QScrollBar：卷滚条，与QSlider功能类似，还可以用于卷滚区域。
+* QProgressBar：进度条，一般用于显示任务进度，可用于数值的百分比显示。实例程序中滑动一个Slider，获取其值并更新ScrollBar和ProgressBar。
+* QDial：表盘式数值输入组件，通过转动表针获取输入值。
+* QLCDNumber：模仿LCD数字的显示组件，可以显示整数和或浮点数，显示整数时可以不同进制显示。实例程序中转动表盘，获得的值显示在LCD组件中。单机“LCD显示进制”的RadioButton时，设置LCD的显示进制。
+
+**QSlider**
+
+**QScrollBar**
+
+**QDial**
+
+**QProgressBar**
+
+**QLCDNumber**
+
+### 4.4 时间日期与定时器
+
+<img src="assets/image-20230924175152343.png" alt="image-20230924175152343" style="zoom:50%;" />
+
+图4-5 实例 `samp4_5`运行时界面
+
+#### 1. 时间日期相关类
+
+Qt中时间日期类型的类如下：
+
+* QTime：时间数据类型，仅表示时间，如：`15:23:13`
+* QDate：日期数据类型，仅表示日期，如：`2017-4-5`
+* QDateTime：日期时间数据类型，表示日期和时间，如：`2017-03-23 08:12:43`
+
+Qt中专门用于日期、时间编辑和显示的界面组件：
+
+* QTimeEdit：编辑和显示时间的组件
+* QDateEdit：编辑和显示日期的组件
+* QDateTimeEdit：编辑和显示日期时间的组件
+* QCalendarWidget：一个用日历形式选择日期的组件
+
+QTimer是定时器，用来处理周期性事件的一种对象，类似于硬件定时器。它是直接从QObject类继承而来，不是界面组件类。
+
+#### 2. 日期时间数据与字符串之间的转换
+
+**1. 时间、日期编辑器属性设置**
+
+略
+
+**2. 日期时间数据的获取与转换为字符串**
+
+略
+
+**3. 字符串转换为日期时间**
+
+略
+
+#### 3. QCalendarWidget 日历组件
+
+ #### 4. 定时器的使用
+
+### 4.5 QComboBox 和 QPlainTextEdit
+
+![image-20230924213830004](assets/image-20230924213830004.png)
+
+QComboBox 是下拉列表框组件类：
+
+* 它提供一个下拉列表供用户选择
+* 每个项（item，或称列表项）还可以关联一个QVariant类型的变量，用于存储一些不可见数据。
+
+QPlainTextEdit 是一个多行文本编辑器，用于显示和编辑多行简单文本。
+
+
+
+
+
 ## 第8章 绘图
 
 
