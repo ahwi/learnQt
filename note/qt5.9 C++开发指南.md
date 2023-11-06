@@ -316,6 +316,253 @@ QComboBox 是下拉列表框组件类：
 
 QPlainTextEdit 是一个多行文本编辑器，用于显示和编辑多行简单文本。
 
+## 第7章 文件系统和文件读写
+
+本章主要介绍：
+
+* 如何实现文本文件、二进制文件的读写
+* 文件和目录的管理功能
+
+### 7.1 文本文件读写
+
+文本文件是指以纯文本格式存储的文件。
+
+Qt提供了两种读写纯文本文件的基本方法：
+
+* 用QFile类的IODevice读写功能直接进行读写
+* 利用QFile和QTextStream结合起来，用流（stream）的方法进行文件读写
+
+示例：`samp7_1`演示了两种方法读写文本文件：
+
+<img src="qt5.9 C++开发指南.assets/image-20231106161409231.png" alt="image-20231106161409231" style="zoom:50%;" />
+
+#### QFile读写文本文件
+
+**使用`QFile`读文件**
+
+```c++
+bool MainWindow::openTextByIODevice(const QString &aFileName)
+{//用IODevice方式打开文本文件
+    QFile   aFile(aFileName);
+//    aFile.setFileName(aFileName);
+
+    if (!aFile.exists()) //文件不存在
+        return false;
+
+    if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    ui->textEditDevice->setPlainText(aFile.readAll());
+    aFile.close();
+
+    ui->tabWidget->setCurrentIndex(0);
+    return  true;
+}
+```
+
+`QFile::open()`函数需传递一个`QIODevice::OpenModeFlag`枚举类型的参数，主要取值如下：
+
+* `QIODevice::ReadOnly`：以只读方式打开文件，用于载入文件。
+* `QIODevice::WriteOnly`：以只写方式打开文件，用于保存文件。（隐含着`Truncate`，即删除文件原有内容）
+* `QIODevice::ReadWrite`：以读写方式打开。
+* `QIODevice::Append`：以添加模式打开，新写入文件的数据添加到文件尾部。
+* `QIODevice::Truncate`：以截取方式打开文件，文件原有的内容全部被删除。
+* `QIODevice::Text`：以文本方式打开文件，读取时"\n"被自动翻译为换行符，写入时字符串结束符会自动翻译为系统平台的编码，如Windows平台下是"\r\n"。
+
+逐行读取的方式：
+
+```c++
+bool MainWindow::openTextByIODevice(const QString &aFileName)
+{//用IODevice方式打开文本文件
+    QFile   aFile(aFileName);
+//    aFile.setFileName(aFileName);
+
+    if (!aFile.exists()) //文件不存在
+        return false;
+
+    if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    ui->textEditDevice->clear();
+    while (!aFile.atEnd())
+    {
+        QByteArray line = aFile.readLine();//自动添加 \n
+        QString str=QString::fromLocal8Bit(line); //从字节数组转换为字符串
+        str.truncate(str.length()-1); //去除结尾增加的空行
+        ui->textEditDevice->appendPlainText(str);
+    }
+    aFile.close();
+
+    ui->tabWidget->setCurrentIndex(0);
+    return  true;
+}
+```
+
+**使用`QFile`保存文件：**
+
+```c++
+bool MainWindow::saveTextByIODevice(const QString &aFileName)
+{ //用IODevice方式保存文本文件
+    QFile   aFile(aFileName);
+//    aFile.setFileName(aFileName);
+
+    if (!aFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        return false;
+
+    QString str=ui->textEditDevice->toPlainText();//整个内容作为字符串
+
+    QByteArray  strBytes=str.toUtf8();//转换为字节数组
+//    QByteArray  strBytes=str.toLocal8Bit();
+
+    aFile.write(strBytes,strBytes.length());  //写入文件
+
+    aFile.close();
+    ui->tabWidget->setCurrentIndex(0);
+    return  true;
+}
+```
+
+#### QFile 和 QTextStream 结合读写文本文件
+
+QTextStream与IO读写设备结合，为数据读写提供了一些方便的方法的类。
+
+QTextStream可以与QFile、QTemporaryFile、QBuffer、QTcpSocket和QUdpSocket等IO设备结合使用。
+
+**QFile与QTextStream结合读取文件**
+
+```c++
+bool MainWindow::openTextByStream(const QString &aFileName)
+{ //用 QTextStream打开文本文件
+    QFile   aFile(aFileName);
+    if (!aFile.exists()) //文件不存在
+        return false;
+
+    if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream aStream(&aFile); //用文本流读取文件
+    aStream.setAutoDetectUnicode(true); //自动检测Unicode,才能正常显示文档内的汉字
+
+    ui->textEditStream->setPlainText(aStream.readAll());
+
+    aFile.close();//关闭文件
+    ui->tabWidget->setCurrentIndex(1);
+    return  true;
+}
+
+```
+
+逐行读取的方式：
+
+```c++
+bool MainWindow::openTextByStream(const QString &aFileName)
+{ //用 QTextStream打开文本文件
+    QFile   aFile(aFileName);
+
+    if (!aFile.exists()) //文件不存在
+        return false;
+
+    if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream aStream(&aFile); //用文本流读取文件
+    aStream.setAutoDetectUnicode(true); //自动检测Unicode,才能正常显示文档内的汉字
+
+    ui->textEditStream->clear();//清空
+    while (!aStream.atEnd())
+    {
+        str=aStream.readLine();//读取文件的一行
+        ui->textEditStream->appendPlainText(str); //添加到文本框显示
+    }
+
+    aFile.close();//关闭文件
+    ui->tabWidget->setCurrentIndex(1);
+    return  true;
+}
+```
+
+
+
+**QFile与QTextStream结合写文件**
+
+```c++
+bool MainWindow::saveTextByStream(const QString &aFileName)
+{//用QTextStream保存文本文件
+    QFile   aFile(aFileName);
+    if (!aFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        return false;
+
+    QTextStream aStream(&aFile); //用文本流读取文件
+    aStream.setAutoDetectUnicode(true); //自动检测Unicode,才能正常显示文档内的汉字
+
+    QString str=ui->textEditStream->toPlainText(); //转换为字符串
+
+    aStream<<str; //写入文本流
+
+    aFile.close();//关闭文件
+    return  true;
+}
+```
+
+#### 解决中文乱码的问题
+
+* 使用`QTextStream`读写中文内容的文本文件时，需调用`setAutoDetectUnicode(true)`才能正确识别Unicode吗，不然读取的中文将是乱码的。
+
+* 也可以在应用中做全局的设置
+
+  ```c++
+  int main(int argc, char *argv[])
+  {
+  	//解决汉字乱码问题
+      QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+      QTextCodec::setCodecForLocale(codec); //解决汉字乱码问题
+  
+      QApplication a(argc, argv);
+      MainWindow w;
+      w.show();
+  
+      return a.exec();
+  }
+  ```
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
