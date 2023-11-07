@@ -525,17 +525,185 @@ bool MainWindow::saveTextByStream(const QString &aFileName)
   }
   ```
 
-  
+
+### 7.2 二进制文件读写
+
+Qt 使用 QFile 和 QDataStream 进行二进制数据文件的读写：
+
+* QFile 负责文件的IO设备接口，即与文件的物理交互。
+* QDataStream 以数据流的方式读取文件内容或写入文件内容。
+
+实例：`samp7_2`演示二进制文件的读写：
+
+以表格的形式编辑一个数据表，采用`Model/View`结构，编辑后的数据保存为二进制文件。
+
+![image-20231107085626767](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107085626767.png)
+
+根据QDataStream保存文件时使用的数据编码的方式不同，可以保存为两种文件：
+
+* 用Qt 预定义编码保存各种类型数据的文件，定义文件后缀为“.stm”。
+  * Qt 写入某种类型数据时用了Qt预定义的标记符，读出数据时，根据标记符读取数据。
+* 编制编码数据文件，定义文件后缀为“.dat”。
+  * 在将数据写到文件时，完全使用数据的二进制原始内容，每个字节都有具体的定义，在读出数据时，只需根据每个字节的定义读取数据即可。
+
+#### Qt 预定义编码文件的读写
+
+**1. 保存为 stm 文件**
+
+```c++
+bool MainWindow::saveDataAsStream(QString &aFileName)
+{//将模型数据保存为Qt预定义编码的数据文件
+    QFile aFile(aFileName);  //以文件方式读出
+    if (!(aFile.open(QIODevice::WriteOnly | QIODevice::Truncate)))
+        return false;
+
+    QDataStream aStream(&aFile);
+    aStream.setVersion(QDataStream::Qt_5_9); //设置版本号，写入和读取的版本号要兼容
+
+    qint16  rowCount=theModel->rowCount(); //数据模型行数
+    qint16  colCount=theModel->columnCount(); //数据模型列数
+
+    aStream<<rowCount; //写入文件流，行数
+    aStream<<colCount;//写入文件流，列数
+
+//获取表头文字
+    for (int i=0;i<theModel->columnCount();i++)
+    {
+        QString str=theModel->horizontalHeaderItem(i)->text();//获取表头文字
+        aStream<<str; //字符串写入文件流，Qt预定义编码方式
+    }
 
 
+//获取数据区的数据
+    for (int i=0;i<theModel->rowCount();i++)
+    {
+        QStandardItem* aItem=theModel->item(i,0); //测深
+        qint16 ceShen=aItem->data(Qt::DisplayRole).toInt();
+        aStream<<ceShen;// 写入文件流，qint16
+
+        aItem=theModel->item(i,1); //垂深
+        qreal chuiShen=aItem->data(Qt::DisplayRole).toFloat();
+        aStream<<chuiShen;//写入文件流， qreal
+
+        aItem=theModel->item(i,2); //方位
+        qreal fangWei=aItem->data(Qt::DisplayRole).toFloat();
+        aStream<<fangWei;//写入文件流， qreal
+
+        aItem=theModel->item(i,3); //位移
+        qreal weiYi=aItem->data(Qt::DisplayRole).toFloat();
+        aStream<<weiYi;//写入文件流， qreal
+
+        aItem=theModel->item(i,4); //固井质量
+        QString zhiLiang=aItem->data(Qt::DisplayRole).toString();
+        aStream<<zhiLiang;// 写入文件流，字符串
+
+        aItem=theModel->item(i,5); //测井
+        bool quYang=(aItem->checkState()==Qt::Checked);
+        aStream<<quYang;// 写入文件流，bool型
+    }
+    aFile.close();
+    return true;
+}
+```
+
+* 在开始写数据流之前，使用`setVersion()`函数为 QDataStream 对象设置版本号。
+
+  > 以 Qt 的预定义类型编码保存的文件需指定流版本号，因为每个版本的 Qt 对数据类型的编码可能有差别，需要保证写文件和读文件的版本是兼容（流版本号一样，或读取文件的流版本号高于写文件时的流版本号）的。
+
+**stm 文件格式**
+
+根据上面的代码，可知该示例的stm文件格式定义如下：
+
+![image-20231107091731313](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107091731313.png)
+
+![image-20231107091747582](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107091747582.png)
+
+从表可知stm文件的数据存储顺序和类型，但是并不知道这些类型的存储方式，读文件时，只需按照上表的顺序和类型读取数据即可。
+
+**3. 读取 stm 文件**
+
+```c++
+bool MainWindow::openDataAsStream(QString &aFileName)
+{ //从Qt预定义流文件读入数据
+    QFile aFile(aFileName);  //以文件方式读出
+    if (!(aFile.open(QIODevice::ReadOnly)))
+        return false;
+
+    QDataStream aStream(&aFile); //用文本流读取文件
+    aStream.setVersion(QDataStream::Qt_5_9); //设置流文件版本号
+
+    qint16  rowCount,colCount;
+    aStream>>rowCount; //读取行数
+    aStream>>colCount; //列数
+
+    this->resetTable(rowCount); //表格复位
+
+    //获取表头文字
+    QString str;
+    for (int i=0;i<colCount;i++)
+        aStream>>str;  //读取表头字符串
+
+    //获取数据区文字，
+    qint16  ceShen;
+    qreal  chuiShen;
+    qreal  fangWei;
+    qreal  weiYi;
+    QString  zhiLiang;
+    bool    quYang;
+    QStandardItem   *aItem;
+    QModelIndex index;
+
+    for (int i=0;i<rowCount;i++)
+    {
+        aStream>>ceShen;//读取测深, qint16
+        index=theModel->index(i,0);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(ceShen,Qt::DisplayRole);
+
+        aStream>>chuiShen;//垂深,qreal
+        index=theModel->index(i,1);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(chuiShen,Qt::DisplayRole);
 
 
+        aStream>>fangWei;//方位,qreal
+        index=theModel->index(i,2);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(fangWei,Qt::DisplayRole);
 
 
+        aStream>>weiYi;//位移,qreal
+        index=theModel->index(i,3);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(weiYi,Qt::DisplayRole);
 
 
+        aStream>>zhiLiang;//固井质量,QString
+        index=theModel->index(i,4);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(zhiLiang,Qt::DisplayRole);
 
+        aStream>>quYang;//bool
+        index=theModel->index(i,5);
+        aItem=theModel->itemFromIndex(index);
+        if (quYang)
+            aItem->setCheckState(Qt::Checked);
+        else
+            aItem->setCheckState(Qt::Unchecked);
+    }
 
+    aFile.close();
+    return true;
+}
+```
+
+使用Qt预定义编码的方式读写文件的特点如下：
+
+* 读写操作都比较方便，支持读写各种数据类型，包括 Qt 的一些类，还可以为流数据读写扩展自定义的数据类型。
+* 写文件和读文件时必须保证使用的流版本兼容。
+* 读写都需采用Qt预定义的编码，其他编程语言来读取文件时会有问题。
+
+#### 标准编码文件的读写
 
 
 
