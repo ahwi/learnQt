@@ -705,13 +705,190 @@ bool MainWindow::openDataAsStream(QString &aFileName)
 
 #### 标准编码文件的读写
 
+**1. 保持为dat文件**
+
+以标准编码的方式创建文件，使文件的每个字节都有具体的定义，用户在读取这种文件时，按照文件格式定义读取每个字节数据并做出解析即可。
+
+保持dat文件的代码：
+
+```c++
+bool MainWindow::saveBinaryFile(QString &aFileName)
+{ //保存为纯二进制文件
+    QFile aFile(aFileName);  //以文件方式读出
+    if (!(aFile.open(QIODevice::WriteOnly)))
+        return false;
+
+    QDataStream aStream(&aFile); //用文本流读取文件
+//    aStream.setVersion(QDataStream::Qt_5_9); //无需设置数据流的版本
+    aStream.setByteOrder(QDataStream::LittleEndian);//windows平台
+//    aStream.setByteOrder(QDataStream::BigEndian);//QDataStream::LittleEndian
+
+    qint16  rowCount=theModel->rowCount();
+    qint16  colCount=theModel->columnCount();
+
+    aStream.writeRawData((char *)&rowCount,sizeof(qint16)); //写入文件流
+    aStream.writeRawData((char *)&colCount,sizeof(qint16));//写入文件流
+
+//获取表头文字
+    QByteArray  btArray;
+    QStandardItem   *aItem;
+    for (int i=0;i<theModel->columnCount();i++)
+    {
+        aItem=theModel->horizontalHeaderItem(i); //获取表头item
+        QString str=aItem->text(); //获取表头文字
+        btArray=str.toUtf8(); //转换为字符数组
+        aStream.writeBytes(btArray,btArray.length()); //写入文件流,长度uint型，然后是字符串内容
+    }
+
+//获取数据区文字，
+    qint8   yes=1,no=0; //分别代表逻辑值 true和false
+    for (int i=0;i<theModel->rowCount();i++)
+    {
+        aItem=theModel->item(i,0); //测深
+        qint16 ceShen=aItem->data(Qt::DisplayRole).toInt();//qint16类型
+        aStream.writeRawData((char *)&ceShen,sizeof(qint16));//写入文件流
+
+        aItem=theModel->item(i,1); //垂深
+        qreal chuiShen=aItem->data(Qt::DisplayRole).toFloat();//qreal 类型
+        aStream.writeRawData((char *)&chuiShen,sizeof(qreal));//写入文件流
+
+        aItem=theModel->item(i,2); //方位
+        qreal fangWei=aItem->data(Qt::DisplayRole).toFloat();
+        aStream.writeRawData((char *)&fangWei,sizeof(qreal));
+
+        aItem=theModel->item(i,3); //位移
+        qreal weiYi=aItem->data(Qt::DisplayRole).toFloat();
+        aStream.writeRawData((char *)&weiYi,sizeof(qreal));
+
+        aItem=theModel->item(i,4); //固井质量
+        QString zhiLiang=aItem->data(Qt::DisplayRole).toString();
+        btArray=zhiLiang.toUtf8();
+        aStream.writeBytes(btArray,btArray.length()); //写入长度,uint，然后是字符串
+//        aStream.writeRawData(btArray,btArray.length());//对于字符串，应使用writeBytes()函数
+
+        aItem=theModel->item(i,5); //测井取样
+        bool quYang=(aItem->checkState()==Qt::Checked); //true or false
+        if (quYang)
+            aStream.writeRawData((char *)&yes,sizeof(qint8));
+        else
+            aStream.writeRawData((char *)&no,sizeof(qint8));
+    }
+
+    aFile.close();
+    return true;
+}
+```
+
+说明：
+
+* 字节序
+
+  如果有必要需要为文件指定字节序，大端字节序或小端字节序。
+
+* `writeRawData()`函数
+
+  `int QDataStream::writeRawData(const char* s, int len)`
+
+  s是一个指向字节型数据的指针，len是字节数据的长度。调用该函数会向文件流连续写入len个字节的数据，这些数据保存在指针s指向的起始地址里。
+
+* `writeBytes()`函数
+
+  `QDataStream &QDataStream::writeBytes(const char* s, uint len)`
+
+  s是一个指向字节型数据的指针，len是字节数据的长度。`writeBytes()`在写入数据时，会先将len作为一个quint32类型写入数据流，然后再写入len个从指针s获取的数据。
+
+  该函数适合于写入字符串数据，因为在写入字符串之前要先写入字符串的长度。
+
+  对于的读取函数为`readBytes()`，它可以自动读取长度和内容。
+
+**dat 文件格式**
+
+上面代码保存的dat文件格式如下：
+
+![image-20231108100925619](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231108100925619.png)
+
+**读取dat文件**
+
+```c++
+bool MainWindow::openBinaryFile(QString &aFileName)
+{//打开二进制文件
+    QFile aFile(aFileName);  //以文件方式读出
+    if (!(aFile.open(QIODevice::ReadOnly)))
+        return false;
+
+    QDataStream aStream(&aFile); //用文本流读取文件
+//    aStream.setVersion(QDataStream::Qt_5_9); //设置数据流的版本
+    aStream.setByteOrder(QDataStream::LittleEndian);
+//    aStream.setByteOrder(QDataStream::BigEndian);
+
+    qint16  rowCount,colCount;
+    aStream.readRawData((char *)&rowCount, sizeof(qint16));
+    aStream.readRawData((char *)&colCount, sizeof(qint16));
+
+    this->resetTable(rowCount);
 
 
+    //获取表头文字,但是并不利用
+    char *buf;
+    uint strLen;  //也就是 quint32
+    for (int i=0;i<colCount;i++)
+    {
+        aStream.readBytes(buf,strLen);//同时读取字符串长度，和字符串内容
+        QString str=QString::fromLocal8Bit(buf,strLen); //可处理汉字
+    }
 
+//获取数据区数据
+    QStandardItem   *aItem;
 
+    qint16  ceShen;
+    qreal  chuiShen;
+    qreal  fangWei;
+    qreal  weiYi;
+    QString  zhiLiang;
+    qint8   quYang; //分别代表逻辑值 true和false
+    QModelIndex index;
 
+    for (int i=0;i<rowCount;i++)
+    {
+        aStream.readRawData((char *)&ceShen, sizeof(qint16)); //测深
+        index=theModel->index(i,0);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(ceShen,Qt::DisplayRole);
 
+        aStream.readRawData((char *)&chuiShen, sizeof(qreal)); //垂深
+        index=theModel->index(i,1);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(chuiShen,Qt::DisplayRole);
 
+        aStream.readRawData((char *)&fangWei, sizeof(qreal)); //方位
+        index=theModel->index(i,2);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(fangWei,Qt::DisplayRole);
+
+        aStream.readRawData((char *)&weiYi, sizeof(qreal)); //位移
+        index=theModel->index(i,3);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(weiYi,Qt::DisplayRole);
+
+        aStream.readBytes(buf,strLen);//固井质量
+        zhiLiang=QString::fromLocal8Bit(buf,strLen);
+        index=theModel->index(i,4);
+        aItem=theModel->itemFromIndex(index);
+        aItem->setData(zhiLiang,Qt::DisplayRole);
+
+        aStream.readRawData((char *)&quYang, sizeof(qint8)); //测井取样
+        index=theModel->index(i,5);
+        aItem=theModel->itemFromIndex(index);
+        if (quYang==1)
+            aItem->setCheckState(Qt::Checked);
+        else
+            aItem->setCheckState(Qt::Unchecked);
+    }
+
+    aFile.close();
+    return true;
+}
+```
 
 
 
