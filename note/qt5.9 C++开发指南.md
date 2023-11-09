@@ -537,7 +537,7 @@ Qt 使用 QFile 和 QDataStream 进行二进制数据文件的读写：
 
 以表格的形式编辑一个数据表，采用`Model/View`结构，编辑后的数据保存为二进制文件。
 
-![image-20231107085626767](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107085626767.png)
+![image-20231107085626767](qt5.9 C++开发指南.assets\image-20231107085626767.png)
 
 根据QDataStream保存文件时使用的数据编码的方式不同，可以保存为两种文件：
 
@@ -614,9 +614,9 @@ bool MainWindow::saveDataAsStream(QString &aFileName)
 
 根据上面的代码，可知该示例的stm文件格式定义如下：
 
-![image-20231107091731313](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107091731313.png)
+![image-20231107091731313](qt5.9 C++开发指南.assets\image-20231107091731313.png)
 
-![image-20231107091747582](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231107091747582.png)
+![image-20231107091747582](qt5.9 C++开发指南.assets\image-20231107091747582.png)
 
 从表可知stm文件的数据存储顺序和类型，但是并不知道这些类型的存储方式，读文件时，只需按照上表的顺序和类型读取数据即可。
 
@@ -805,7 +805,7 @@ bool MainWindow::saveBinaryFile(QString &aFileName)
 
 上面代码保存的dat文件格式如下：
 
-![image-20231108100925619](D:\node\node\learnQt\note\qt5.9 C++开发指南.assets\image-20231108100925619.png)
+![image-20231108100925619](qt5.9 C++开发指南.assets\image-20231108100925619.png)
 
 **读取dat文件**
 
@@ -889,6 +889,76 @@ bool MainWindow::openBinaryFile(QString &aFileName)
     return true;
 }
 ```
+
+### 7.3 文件目录操作
+
+#### 文件目录操作相关的类
+
+Qt 提供的与文件和目录操作相关的类包括以下几个：
+
+* QCoreApplication: 用于提取应用程序路径、程序名等文件信息。
+* QFile: 除了打开文件操作外，QFile 还有复制文件、删除文件等功能。
+* QFileInfo: 用于提取文件的信息，包括路径、文件名、后缀等。
+* QDire: 用于提取目录或文件信息，获取一个目录下的文件或目录列表，创建或删除目录和文件，文件重命名等操作。
+* QTemporaryDir 和 QTemporaryFile: 用于创建临时目录和临时文件。
+* QFileSystemWatcher: 文件和目录监听类，监听目录下文件的添加、删除等变化，监听文件修改变化。
+
+#### 实例概述
+
+实例`samp7_3`演示前述各种目录与文件操作类的主要功能
+
+![image-20231109093915883](qt5.9 C++开发指南.assets/image-20231109093915883.png)
+
+在按钮被单击时，先显示按钮的标题和ToolTip信息，以便明显的知道按钮演示的功能，例如：`baseName()`按钮的`clicked()`操函数代码如下：
+
+```c++
+void Dialog::showBtnInfo(QObject *btn)
+{ //显示btn的信息
+    QPushButton *theBtn =static_cast<QPushButton*>(btn);
+    ui->plainTextEdit->appendPlainText(theBtn->text());
+    ui->plainTextEdit->appendPlainText(theBtn->toolTip()+"\n");
+}
+
+void Dialog::on_pushButton_30_clicked()
+{//QFileInfo.basename()
+    showBtnInfo(sender());
+    QFileInfo  fileInfo(ui->editFile->text());
+    QString  str=fileInfo.baseName();
+    ui->plainTextEdit->appendPlainText(str+"\n");
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
