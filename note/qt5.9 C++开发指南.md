@@ -928,31 +928,72 @@ void Dialog::on_pushButton_30_clicked()
 }
 ```
 
+#### QCoreApplication 类
+
+* QCoreApplication 是为无GUI应用提供事件循环的类，是所有应用程序类的基类。
+* QCoreApplication 的子类 QGuiApplication 为有GUI界面的应用程序提供流控制和主要的设定
+* QGuiApplication 的子类 QApplication 为基于 QWidget 的应用程序提供支持，包括界面的初始化等。
+
+QCoreApplication 提供的有用函数：
+
+![image-20231110084616378](qt5.9 C++开发指南.assets/image-20231110084616378.png)
+
+#### QFile 类
+
+QFile 分别提供了静态函数和成员函数用于文件操作：
+
+![image-20231110084834194](qt5.9 C++开发指南.assets/image-20231110084834194.png)
+
+![image-20231110084846680](qt5.9 C++开发指南.assets/image-20231110084846680.png)
 
 
 
+#### QFileInfo 类
 
+QFileInfo 类的接口函数提供文件的各种信息。
 
+![image-20231110085006578](qt5.9 C++开发指南.assets/image-20231110085006578.png)
 
+#### QDir 类
 
+QDir 是进行目录操作的类
 
+![image-20231110085101377](qt5.9 C++开发指南.assets/image-20231110085101377.png)
 
+![image-20231110085111704](qt5.9 C++开发指南.assets/image-20231110085111704.png)
 
+![image-20231110085135981](qt5.9 C++开发指南.assets/image-20231110085135981.png)
 
+#### QTemporaryDir 和 QTemporaryFile
 
+QTemporaryDir 是用于创建、删除临时目录的类。
 
+![image-20231110085403405](qt5.9 C++开发指南.assets/image-20231110085403405.png)
 
+* QTemporaryDir
+  * 在系统临时目录，即 `QDir::tempPath` 目录下创建一个临时目录，临时目录名称为 `QCoreApplication:: applicationName()`为前缀，后加6个字符。
+  * 临时目录可设置为使用完后自动删除，即临时目录变量删除时，临时目录也删除。
+* QTemporaryFile 用于创建临时文件的类，临时文件保存在临时目录下。
+  * 临时目录以`QCoreApplication::applicationName()`作为文件名，以`XXXXXX`6个随机数字作为文件后缀。
+  * 可设置是否自动删除临时文件。
+  * `QTemporary::open()`函数用于打开临时文件，只有打开临时文件，才实际创建了此文件。
 
+#### QFileSystemWatcher 类
 
+QFileSystemWatcher 是对目录和文件进行监听的类。
 
+把某些目录或文件添加到 QFileSystemWatcher 对象的监听列表后，当目录下发生文件新建、删除等操作时会发射`directoryChanged()`信号，当监听的文件发生修改、重命名等操作时，会发射 `fileChanged()`信号。所以，这个类在进行目录或文件监听时起作用。
 
+**QFileSystemWatcher  的主要接口函数：**
 
+![image-20231110090326546](qt5.9 C++开发指南.assets/image-20231110090326546.png)
 
+**QFileSystemWatcher 的两个信号，分别是目录变化和文件变化时发射的信号**
 
-
-
-
-
+```c++
+void QFileSystemWatcher::directoryChanged(const QString &path)
+void QFileSystemWatcher::fileChanged(const QString &path)
+```
 
 
 
