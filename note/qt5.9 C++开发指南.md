@@ -560,13 +560,138 @@ void MainWindow::on_treeView_clicked(const QModelIndex &index)
 }
 ```
 
+### 5.3 QStringListModel
 
+QStringListModel 用于处理字符串列表的数据模型，它可以作为QListView的数据模型，在界面上显示和编辑字符串列表。
 
+QStringListModel：
 
+* `setStringList()`函数：可以初始化数据集模型的字符串列表的内容。
 
+* `stringList()`函数：返回数据模型内的字符串列表。
 
+* 提供编辑和修改字符串列表数据的函数：
 
+  * `insertRows()`
+  * `removeRows()`
+  * `setData()`
+  * 等
 
+  > 这些操作直接影响数据模型内部的字符串列表，并且修改后的数据会自动在关联的ListView组件里刷新显示。
+
+#### QStringListModel 的使用
+
+实例`samp5_2`，QStringListModel 作为数据模型，QListView作为视图组件，实现编辑字符串列表的功能。
+
+![image-20231114101501923](qt5.9 C++开发指南.assets/image-20231114101501923.png)
+
+**1. Model/View 结构对象和组件初始化**
+
+```c++
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+
+    QStringList         theStrList; //保存初始 StringList
+    theStrList<<"北京"<<"上海"<<"天津"<<"河北"<<"山东"<<"四川"<<"重庆"<<"广东"<<"河南"; //初始化 StringList
+
+    theModel=new QStringListModel(this); //创建数据模型
+    theModel->setStringList(theStrList); //为模型设置StringList，会导入StringList的内容
+    ui->listView->setModel(theModel); //为listView设置数据模型
+
+    ui->listView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+}
+```
+
+* QStringListModel 的 `setStringList()` 函数将一个字符串列表的内容作为数据模型的初始化数据内容。
+* QListView 的 `setModel()` 函数作为界面视图组件设置一个数据模型。
+
+**2. 编辑、添加、删除项的操作**
+
+* 编辑
+
+    ```c++
+    ui->listView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+    ```
+
+	设置QListView 是否可编辑，上面的代码表示在双击、或选择并单击列表项后，就进入编辑状态。
+
+* 添加
+
+  ```c++
+  void Widget::on_btnListAppend_clicked()
+  { //添加一行
+      theModel->insertRow(theModel->rowCount()); //在尾部插入一空行
+      QModelIndex index=theModel->index(theModel->rowCount()-1,0);//获取最后一行
+      theModel->setData(index,"new item",Qt::DisplayRole);//设置显示文字
+      ui->listView->setCurrentIndex(index); //设置当前选中的行
+  }
+  
+  void Widget::on_btnListInsert_clicked()
+  {//插入一行
+      QModelIndex  index;
+      index=ui->listView->currentIndex(); //当前 modelIndex
+      theModel->insertRow(index.row()); //在当前行的前面插入一行
+      theModel->setData(index,"inserted item",Qt::DisplayRole); //设置显示文字
+      theModel->setData(index,Qt::AlignRight,Qt::TextAlignmentRole); //设置对齐方式，不起作用
+      ui->listView->setCurrentIndex(index); //设置当前选中的行
+  }
+  ```
+
+* 删除当前项
+
+  ```c++
+  void Widget::on_btnListDelete_clicked()
+  {//删除当前行
+      QModelIndex  index;
+      index=ui->listView->currentIndex(); //获取当前 modelIndex
+      theModel->removeRow(index.row()); //删除当前行
+  }
+  ```
+
+* 删除列表
+
+  ```c++
+  void Widget::on_btnListClear_clicked()
+  {//清除ListView的所有项
+      theModel->removeRows(0,theModel->rowCount());
+  }
+  ```
+
+**3. 以文本显示数据模型的内容**
+
+```c++
+void Widget::on_btnTextImport_clicked()
+{// 显示数据模型的StringList
+    QStringList tmpList;
+    tmpList=theModel->stringList();//获取数据模型的StringList
+
+    ui->plainTextEdit->clear(); //文本框清空
+    for (int i=0; i<tmpList.count();i++)
+        ui->plainTextEdit->appendPlainText(tmpList.at(i)); //显示数据模型的StringList()返回的内容
+}
+```
+
+**4. 其他功能**
+
+显示当前项的模型所以的行和列的信息
+
+```c++
+void Widget::on_listView_clicked(const QModelIndex &index)
+{ //显示QModelIndex的行、列号
+    ui->LabInfo->setText(QString::asprintf("当前项:row=%d, column=%d",
+                        index.row(),index.column()));
+}
+```
+
+#### Model/View结构与便利组件之间的主要区别
+
+第4章的实例`samp4_7`中采用QListWidget 设计了一个列表编辑器，对比这两个实例的不同：
+
+* 在 Model/View 结构中，数据模型与视图组件是分离的，可以直接操作数据模型以修改数据，在视图组件中做的修改也会自动保存到数据模型里。
+* 在使用 QListWidget 的例子中，每个列表项是一个QListWidgetItem 类型的变量，保持了项的各种数据，数据和显示界面是一体的，对数据的修改操作就是对项关联的变量的修改。
 
 
 
