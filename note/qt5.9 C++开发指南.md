@@ -485,6 +485,117 @@ role是`Qt::ItemDataRole`枚举类型：
 
 ![image-20231113173947660](qt5.9 C++开发指南.assets/image-20231113173947660.png)
 
+### 5.2 QFileSystemModel
+
+#### QFileSystemModel 类的基本功能
+
+QFileSystemModel 提供了一个可用于访问本机文件系统的数据模型。
+
+* QFileSystemModel  提供的接口函数可以用来操作目录和文件等。
+
+* QFileSystemModel 和视图组件QTreeView、QListView、QTableView结合使用
+
+* 要通过QFileSystemModel 获取本机的文件系统，需要用`setRootPath()`函数为QFileSystemModel设置一个根目录：
+
+  ```cpp
+  QFileSystemModel *model = new QFileSystemModel;
+  model->setRootPath(QDir::currentPath());
+  ```
+
+* 用于获取磁盘文件目录的数据模型类还有一个QDireModel
+
+  * QDireModel 和 QFileSystemModel 的功能类似，也可获取目录和文件。
+  * QFileSystemModel 采用单独的线程获取目录文件结构，不会阻碍主线程；而QDirModel 不使用单独的线程。
+
+#### QFileSystemModel 的使用
+
+实例`samp5_1`
+
+![image-20231114092622780](qt5.9 C++开发指南.assets/image-20231114092622780.png)
+
+主窗口的构造函数如下：
+
+```c++
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    model=new QFileSystemModel(this); //QFileSystemModel提供单独线程，推荐使用
+    model->setRootPath(QDir::currentPath()); //设置根目录
+
+    ui->treeView->setModel(model); //设置数据模型
+    ui->listView->setModel(model); //设置数据模型
+    ui->tableView->setModel(model); //设置数据模型
+
+//信号与槽关联，treeView单击时，其目录设置为listView和tableView的根节点
+    connect(ui->treeView,SIGNAL(clicked(QModelIndex)),
+            ui->listView,SLOT(setRootIndex(QModelIndex)));
+
+    connect(ui->treeView,SIGNAL(clicked(QModelIndex)),
+            ui->tableView,SLOT(setRootIndex(QModelIndex)));
+}
+```
+
+* 3个视图组件都使用`setModel()`函数设置数据模型
+* `connect()`设置信号与槽的关联：在单机treeView 的一个节点时，此节点就设置为 listView 和 tableView 的根节点，因为treeView的 clicked(QModelIndex) 信号会传递一个 QModelIndex 变量，是当前节点的模型索引，将此模型索引传递给listView 和 tableView 的槽函数 `setRootIndex(QModelIndex)`，listView 和 tableView 就会显示此节点下的目录和文件。
+
+在treeView 上单击一个节点时，下方的标签就会显示该节点的相关信息：
+
+```c++
+void MainWindow::on_treeView_clicked(const QModelIndex &index)
+{
+    ui->chkIsDir->setChecked(model->isDir(index));
+    ui->LabPath->setText(model->filePath(index));
+    ui->LabType->setText(model->type(index));
+
+    ui->LabFileName->setText(model->fileName(index));
+
+    int sz=model->size(index)/1024;
+    if (sz<1024)
+        ui->LabFileSize->setText(QString("%1 KB").arg(sz));
+    else
+        ui->LabFileSize->setText(QString::asprintf("%.1f MB",sz/1024.0));
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
